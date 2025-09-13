@@ -3,170 +3,36 @@
 package tinygo_logger
 
 import (
-	"os"
-	"time"
 	"encoding/binary"
 	"math"
+	"os"
+	"time"
 
+	tinygobuffers "github.com/ralvarezdev/tinygo-buffers"
 	tinygotypes "github.com/ralvarezdev/tinygo-types"
 )
 
 type (
 	// DefaultLogger is a simple implementation of the Logger interface
-	DefaultLogger struct{}
+	DefaultLogger struct{
+		messageBuffer []byte
+		messageIndex int
+	}
 )
 
 // NewDefaultLogger creates a new DefaultLogger instance
-func NewDefaultLogger() *DefaultLogger {
-	return &DefaultLogger{}
-}
-
-// uintToHexIndex returns the index in the asciiHexDigits for a given uint value
 //
 // Parameters:
 //
-//	value: The uint value to convert.
-// size: The size of the uint (8, 16, 32, or 64).
-// pos: The position of the hex digit to retrieve (0-based).
+//	bufferSize: The size of the message buffer to allocate.
 //
 // Returns:
 //
-// The index in the asciiHexDigits for the specified hex digit, or -1 if the position is out of range.
-func (l *DefaultLogger) uintToHexIndex(value uint64, size int, pos int) int {
-	if pos < 0 || pos > (size/4)-1 {
-		return -1
+//	*DefaultLogger: A pointer to the newly created DefaultLogger instance.
+func NewDefaultLogger(bufferSize uint64) *DefaultLogger {
+	return &DefaultLogger{
+		messageBuffer: make([]byte, bufferSize),
 	}
-	shift := (size/4-1 - pos) * 4
-	return int((value >> shift) & 0x0F)
-}
-
-// uint8ToHex converts a uint8 value to its hexadecimal representation
-//
-// Parameters:
-//
-//	value: The uint8 value to convert.
-//
-// Returns:
-//
-// A byte slice representing the hexadecimal representation of the uint8 value.
-func (l *DefaultLogger) uint8ToHex(value uint8) []byte {
-	for c := range uintToHexBuffer {
-		index := l.uintToHexIndex(uint64(value), 8, c)
-		if index >= 0 {
-			uintToHexBuffer[c] = asciiHexDigits[index]
-		}
-	}
-	return uintToHexBuffer[:2]
-}
-
-// uint16ToHex converts a uint16 value to its hexadecimal representation
-//
-// Parameters:
-//
-//	value: The uint16 value to convert.
-//
-// Returns:
-//
-// A byte slice representing the hexadecimal representation of the uint16 value.
-func (l *DefaultLogger) uint16ToHex(value uint16) []byte {
-	for c := range uintToHexBuffer {
-		index := l.uintToHexIndex(uint64(value), 16, c)
-		if index >= 0 {
-			uintToHexBuffer[c] = asciiHexDigits[index]
-		}
-	}
-	return uintToHexBuffer[:4]
-}
-
-// uint32ToHex converts a uint32 value to its hexadecimal representation
-//
-// Parameters:
-//
-//	value: The uint32 value to convert.
-//
-// Returns:
-//
-// A byte slice representing the hexadecimal representation of the uint32 value.
-func (l *DefaultLogger) uint32ToHex(value uint32) []byte {
-	for c := range uintToHexBuffer {
-		index := l.uintToHexIndex(uint64(value), 32, c)
-		if index >= 0 {
-			uintToHexBuffer[c] = asciiHexDigits[index]
-		}
-	}
-	return uintToHexBuffer[:8]
-}
-
-// uint64ToHex converts a uint64 value to its hexadecimal representation
-//
-// Parameters:
-//
-//	value: The uint64 value to convert.
-//
-// Returns:
-//
-// A byte slice representing the hexadecimal representation of the uint64 value.
-func (l *DefaultLogger) uint64ToHex(value uint64) []byte {
-	for c := range uintToHexBuffer {
-		index := l.uintToHexIndex(value, 64, c)
-		if index >= 0 {
-			uintToHexBuffer[c] = asciiHexDigits[index]
-		}
-	}
-	return uintToHexBuffer[:16]
-}
-
-// uintToDecimal converts a uint8 value to its decimal representation
-//
-// Parameters:
-//
-//	value: The uint8 value to convert.
-//
-// Returns:
-//
-// A byte slice representing the decimal representation of the uint8 value.
-func (l *DefaultLogger) uintToDecimal(value uint64) []byte {
-    // Fill buffer from the end
-    i := len(uintToDecimalBuffer)
-    v := value
-    if v == 0 {
-        i--
-        uintToDecimalBuffer[i] = asciiDecimalDigits[0]
-    }
-    for v > 0 && i > 0 {
-        i--
-        uintToDecimalBuffer[i] = asciiDecimalDigits[v%10]
-        v /= 10
-    }
-    return uintToDecimalBuffer[i:]
-}
-
-// uintToDecimalFixed converts a uint value to its decimal representation with fixed width
-//
-// Parameters:
-//
-//	value: The uint value to convert.
-//	width: The fixed width for the decimal representation.
-//
-// Returns:
-//
-// A byte slice representing the decimal representation of the uint value with leading zeros if necessary.
-func (l *DefaultLogger) uintToDecimalFixed(value uint64, width int) []byte {
-    buffer := l.uintToDecimal(uint64(value))
-    pad := width - len(buffer)
-
-	// Check if padding is needed
-	if pad <= 0 {
-		return buffer
-	}
-    
-	// Move existing digits to the right
-	copy(uintToDecimalBuffer[pad:], buffer)
-    // Prepend leading zeros
-    for i := 0; i < pad; i++ {
-        uintToDecimalBuffer[i] = asciiDecimalDigits[0]
-    }
-    return uintToDecimalBuffer[:width]
 }
 
 // writeTimestamp is a helper function to print the current timestamp
@@ -180,27 +46,27 @@ func (l *DefaultLogger) writeTimestamp() {
 	millisecond := now % time.Second.Milliseconds()
 
 	// Print the timestamp in the format HH:MM:SS.mmm
-	buffer := l.uintToDecimalFixed(uint64(hour), 2)
+	buffer := tinygobuffers.UintToDecimalFixed(uint64(hour), 2)
 	os.Stdout.Write(buffer)
-	os.Stdout.Write(twoPointsBuffer)
-	buffer = l.uintToDecimalFixed(uint64(minute), 2)
+	os.Stdout.Write(tinygobuffers.TwoPointsBuffer)
+	buffer = tinygobuffers.UintToDecimalFixed(uint64(minute), 2)
 	os.Stdout.Write(buffer)
-	os.Stdout.Write(twoPointsBuffer)
-	buffer = l.uintToDecimalFixed(uint64(second), 2)
+	os.Stdout.Write(tinygobuffers.TwoPointsBuffer)
+	buffer = tinygobuffers.UintToDecimalFixed(uint64(second), 2)
 	os.Stdout.Write(buffer)
-	os.Stdout.Write(dotBuffer)
-	buffer = l.uintToDecimalFixed(uint64(millisecond), 3)
+	os.Stdout.Write(tinygobuffers.DotBuffer)
+	buffer = tinygobuffers.UintToDecimalFixed(uint64(millisecond), 3)
 	os.Stdout.Write(buffer)
 }
 
 // writeNewline is a helper function to print a newline 
 func (l *DefaultLogger) writeNewline() {
-	os.Stdout.Write(newlineBuffer)
+	os.Stdout.Write(tinygobuffers.NewlineBuffer)
 }
 
 // writeSpace is a helper function to print a space
 func (l *DefaultLogger) writeSpace() {
-	os.Stdout.Write(whitespaceBuffer)
+	os.Stdout.Write(tinygobuffers.WhitespaceBuffer)
 }
 
 // writeHeader is a helper function to print the header if required
@@ -219,39 +85,39 @@ func (l *DefaultLogger) writeHeader(header []byte) {
 
 // writeMessage is a helper function to print the message from the messageBuffer
 func (l *DefaultLogger) writeMessage() {
-	if messageIndex > 0 {
-		os.Stdout.Write(messageBuffer[:messageIndex])
-		messageIndex = 0 // Reset index after printing
+	if l.messageIndex > 0 {
+		os.Stdout.Write(l.messageBuffer[:l.messageIndex])
+		l.messageIndex = 0 // Reset index after printing
 	}
 }
 
 // checkIndex checks if the messageIndex exceeds the messageBuffer size
 func (l *DefaultLogger) checkIndex() {
-	if messageIndex >= len(messageBuffer) {
+	if l.messageIndex >= len(l.messageBuffer) {
 		// Buffer full, print the message and reset the index
-		l.log(fullBufferHeader)
-		messageIndex = 0 // Reset index if it exceeds buffer size
+		l.log(FullBufferHeader)
+		l.messageIndex = 0 // Reset index if it exceeds buffer size
 	}
 }
 
 // AddSpace function to add a whitespace character to the messageBuffer
 func (l *DefaultLogger) AddSpace() {
-	messageBuffer[messageIndex] = whitespaceBuffer[0]
-	messageIndex++
+	l.messageBuffer[l.messageIndex] = tinygobuffers.WhitespaceBuffer[0]
+	l.messageIndex++
 	l.checkIndex()
 }
 
 // AddNewline function to add a newline character to the messageBuffer
 func (l *DefaultLogger) AddNewline() {
-	messageBuffer[messageIndex] = newlineBuffer[0]
-	messageIndex++
+	l.messageBuffer[l.messageIndex] = tinygobuffers.NewlineBuffer[0]
+	l.messageIndex++
 	l.checkIndex()
 }
 
 // AddTab function to add a tab character to the messageBuffer
 func (l *DefaultLogger) AddTab() {
-	messageBuffer[messageIndex] = tabBuffer[0]
-	messageIndex++
+	l.messageBuffer[l.messageIndex] = tinygobuffers.TabBuffer[0]
+	l.messageIndex++
 	l.checkIndex()
 }
 
@@ -263,14 +129,14 @@ func (l *DefaultLogger) AddTab() {
 // newline: Whether to include a newline at the end of the log message.
 func (l *DefaultLogger) AddHexCode(hexBuffer []byte, newline bool) {
 	if hexBuffer != nil {
-		for c := range hexPrefix {
-			messageBuffer[messageIndex] = hexPrefix[c]
-			messageIndex++
+		for c := range tinygobuffers.HexPrefix {
+			l.messageBuffer[l.messageIndex] = tinygobuffers.HexPrefix[c]
+			l.messageIndex++
 			l.checkIndex()
 		}
 		for c := range hexBuffer {
-			messageBuffer[messageIndex] = hexBuffer[c]
-			messageIndex++
+			l.messageBuffer[l.messageIndex] = hexBuffer[c]
+			l.messageIndex++
 			l.checkIndex()
 		}
 
@@ -299,10 +165,10 @@ func (l *DefaultLogger) AddErrorCode(errCode tinygotypes.ErrorCode, newline bool
 //	hexCode: Whether to add the uint8 value in hexadecimal format.
 func (l *DefaultLogger) AddUint8(value uint8, newline bool, hexCode bool) {
 	if hexCode {
-		buffer := l.uint8ToHex(value)
+		buffer := tinygobuffers.Uint8ToHex(value)
 		l.AddHexCode(buffer, newline)
 	} else {
-		buffer := l.uintToDecimal(uint64(value))
+		buffer := tinygobuffers.UintToDecimal(uint64(value))
 		l.AddMessage(buffer, newline)
 	}
 }
@@ -316,10 +182,10 @@ func (l *DefaultLogger) AddUint8(value uint8, newline bool, hexCode bool) {
 // hexCode: Whether to add the uint16 value in hexadecimal format.
 func (l *DefaultLogger) AddUint16(value uint16, newline bool, hexCode bool) {
 	if hexCode {
-		buffer := l.uint16ToHex(value)
+		buffer := tinygobuffers.Uint16ToHex(value)
 		l.AddHexCode(buffer, newline)
 	} else {
-		buffer := l.uintToDecimal(uint64(value))
+		buffer := tinygobuffers.UintToDecimal(uint64(value))
 		l.AddMessage(buffer, newline)
 	}
 }
@@ -333,10 +199,10 @@ func (l *DefaultLogger) AddUint16(value uint16, newline bool, hexCode bool) {
 // hexCode: Whether to add the uint32 value in hexadecimal format.
 func (l *DefaultLogger) AddUint32(value uint32, newline bool, hexCode bool) {
 	if hexCode {
-		buffer := l.uint32ToHex(value)
+		buffer := tinygobuffers.Uint32ToHex(value)
 		l.AddHexCode(buffer, newline)
 	} else {
-		buffer := l.uintToDecimal(uint64(value))
+		buffer := tinygobuffers.UintToDecimal(uint64(value))
 		l.AddMessage(buffer, newline)
 	}
 }
@@ -350,10 +216,10 @@ func (l *DefaultLogger) AddUint32(value uint32, newline bool, hexCode bool) {
 // hexCode: Whether to add the uint64 value in hexadecimal format.
 func (l *DefaultLogger) AddUint64(value uint64, newline bool, hexCode bool) {
 	if hexCode {
-		buffer := l.uint64ToHex(value)
+		buffer := tinygobuffers.Uint64ToHex(value)
 		l.AddHexCode(buffer, newline)
 	} else {
-		buffer := l.uintToDecimal(uint64(value))
+		buffer := tinygobuffers.UintToDecimal(uint64(value))
 		l.AddMessage(buffer, newline)
 	}
 }
@@ -366,8 +232,8 @@ func (l *DefaultLogger) AddUint64(value uint64, newline bool, hexCode bool) {
 //	newline: Whether to include a newline at the end of the log message.
 func (l *DefaultLogger) AddFloat64(value float64, newline bool) {
 	// Store the float64 value in the buffer
-	binary.BigEndian.PutUint64(float64Buffer[:], math.Float64bits(value))
-	l.AddMessage(float64Buffer[:], newline)
+	binary.BigEndian.PutUint64(tinygobuffers.Float64Buffer[:], math.Float64bits(value))
+	l.AddMessage(tinygobuffers.Float64Buffer[:], newline)
 }
 
 // AddMessage function to add a message to the messageBuffer
@@ -379,8 +245,8 @@ func (l *DefaultLogger) AddFloat64(value float64, newline bool) {
 func (l *DefaultLogger) AddMessage(message []byte, newline bool) {
 	if message != nil {
 		for c := range message {
-			messageBuffer[messageIndex] = message[c]
-			messageIndex++
+			l.messageBuffer[l.messageIndex] = message[c]
+			l.messageIndex++
 			l.checkIndex()
 		}
 
@@ -514,22 +380,22 @@ func (l *DefaultLogger) log(header []byte) {
 
 // Debug function to print debug messages with messageBuffer content
 func (l *DefaultLogger) Debug() {
-	l.log(debugHeader)
+	l.log(DebugHeader)
 }
 
 // Warning function to print warning messages with messageBuffer content
 func (l *DefaultLogger) Warning() {
-	l.log(warningHeader)
+	l.log(WarningHeader)
 }
 
 // Error function to print error messages with messageBuffer content
 func (l *DefaultLogger) Error() {
-	l.log(errorHeader)
+	l.log(ErrorHeader)
 }
 
 // Info function to print info messages with messageBuffer content
 func (l *DefaultLogger) Info() {
-	l.log(infoHeader)
+	l.log(InfoHeader)
 }
 
 // DebugMessage function to print a debug message
