@@ -3,8 +3,6 @@
 package tinygo_logger
 
 import (
-	"encoding/binary"
-	"math"
 	"os"
 	"time"
 
@@ -232,7 +230,7 @@ func (l *DefaultLogger) AddUint64(value uint64, newline bool, hexCode bool) {
 //	newline: Whether to include a newline at the end of the log message.
 func (l *DefaultLogger) AddFloat64(value float64, newline bool) {
 	// Store the float64 value in the buffer
-	binary.BigEndian.PutUint64(tinygobuffers.Float64Buffer[:], math.Float64bits(value))
+	tinygobuffers.Float64ToBytes(value, tinygobuffers.Float64Buffer[:])
 	l.AddMessage(tinygobuffers.Float64Buffer[:], newline)
 }
 
