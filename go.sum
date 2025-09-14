@@ -1,6 +1,4 @@
-github.com/ralvarezdev/tinygo-buffers v0.1.0 h1:l+Z9sVYMRcDLOHwQZiWlj/TRNxJ5boSzTcml+tBm4y8=
-github.com/ralvarezdev/tinygo-buffers v0.1.0/go.mod h1:W99pKwEDSEqhv7sPrqOlAhi9fAPGVYJMI2HBmZ5Mq3U=
-github.com/ralvarezdev/tinygo-buffers v0.1.1 h1:X90nTay0JdoWR3v4ZaskQqXUMSA6NBXM5WLoNJYpku8=
-github.com/ralvarezdev/tinygo-buffers v0.1.1/go.mod h1:tGklXbGcbTrmFp/+qDUwQ4iSSdeUh/LDYxZ0P+Aeeko=
+github.com/ralvarezdev/tinygo-buffers v0.1.2 h1:Vjz0kBxhE8toK2hIWaZ0cj6at3TH+Ra/WUCeibNE4n8=
+github.com/ralvarezdev/tinygo-buffers v0.1.2/go.mod h1:tGklXbGcbTrmFp/+qDUwQ4iSSdeUh/LDYxZ0P+Aeeko=
 github.com/ralvarezdev/tinygo-types v0.0.3 h1:h8ogOD2lOVxR+w5i6o+v/8qTROFA2KBjVXBM7NT3SMc=
 github.com/ralvarezdev/tinygo-types v0.0.3/go.mod h1:2u3ApwAtIqGZ6wDsmUYt44bIk1DEn06INNjtfWndCr4=
