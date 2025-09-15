@@ -1,5 +1,3 @@
-//go:build tinygo && (rp2040 || rp2350)
-
 package tinygo_logger
 
 import (
@@ -7,7 +5,7 @@ import (
 	"time"
 
 	tinygobuffers "github.com/ralvarezdev/tinygo-buffers"
-	tinygotypes "github.com/ralvarezdev/tinygo-types"
+	tinygoerrors "github.com/ralvarezdev/tinygo-errors"
 )
 
 type (
@@ -150,7 +148,7 @@ func (l *DefaultLogger) AddHexCode(hexBuffer []byte, newline bool) {
 //
 //	errCode: The error code to add to the message buffer.
 // newline: Whether to include a newline at the end of the log message.
-func (l *DefaultLogger) AddErrorCode(errCode tinygotypes.ErrorCode, newline bool) {
+func (l *DefaultLogger) AddErrorCode(errCode tinygoerrors.ErrorCode, newline bool) {
 	l.AddUint16(uint16(errCode), newline, true)
 }
 
@@ -278,7 +276,7 @@ func (l *DefaultLogger) AddMessageWithHexCode(message []byte, hexBuffer []byte, 
 //	errCode: The error code to add to the message buffer.
 //	separate: Whether to include a space between the message and error code.
 //	newline: Whether to include a newline at the end of the log message.
-func (l *DefaultLogger) AddMessageWithErrorCode(message []byte, errCode tinygotypes.ErrorCode, separate bool, newline bool) {
+func (l *DefaultLogger) AddMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool, newline bool) {
 	l.AddMessageWithUint16(message, uint16(errCode), separate, newline, true)
 }
 
@@ -443,7 +441,7 @@ func (l *DefaultLogger) InfoMessage(message []byte) {
 //	message: The byte slice representing the warning message to print.
 //	errCode: The error code to add to the message buffer.
 //	separate: Whether to include a space between the message and error code.
-func (l *DefaultLogger) WarningMessageWithErrorCode(message []byte, errCode tinygotypes.ErrorCode, separate bool) {
+func (l *DefaultLogger) WarningMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool) {
 	l.AddMessageWithErrorCode(message, errCode, separate, true)
 	l.Warning()
 }
@@ -455,7 +453,7 @@ func (l *DefaultLogger) WarningMessageWithErrorCode(message []byte, errCode tiny
 //	message: The byte slice representing the error message to print.
 //	errCode: The error code to add to the message buffer.
 //	separate: Whether to include a space between the message and error code.
-func (l *DefaultLogger) ErrorMessageWithErrorCode(message []byte, errCode tinygotypes.ErrorCode, separate bool) {
+func (l *DefaultLogger) ErrorMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool) {
 	l.AddMessageWithErrorCode(message, errCode, separate, true)
 	l.Error()
 }

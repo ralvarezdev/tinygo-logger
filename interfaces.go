@@ -1,9 +1,7 @@
-//go:build tinygo && (rp2040 || rp2350)
-
 package tinygo_logger
 
 import (
-	tinygotypes "github.com/ralvarezdev/tinygo-types"
+	tinygoerrors "github.com/ralvarezdev/tinygo-errors"
 )
 
 type (
@@ -13,7 +11,7 @@ type (
 		AddNewline()
 		AddTab()
 		AddHexCode(hexCode []byte, newline bool)
-		AddErrorCode(errCode tinygotypes.ErrorCode, newline bool)
+		AddErrorCode(errCode tinygoerrors.ErrorCode, newline bool)
 		AddUint8(value uint8, newline bool, hexCode bool)
 		AddUint16(value uint16, newline bool, hexCode bool)
 		AddUint32(value uint32, newline bool, hexCode bool)
@@ -21,7 +19,7 @@ type (
 		AddFloat64(value float64, newline bool)
 		AddMessage(message []byte, newline bool)
 		AddMessageWithHexCode(message []byte, hexBuffer []byte, separate bool, newline bool)
-		AddMessageWithErrorCode(message []byte, errCode tinygotypes.ErrorCode, separate bool, newline bool)
+		AddMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool, newline bool)
 		AddMessageWithUint8(message []byte, value uint8, separate bool, newline bool, hexCode bool)
 		AddMessageWithUint16(message []byte, value uint16, separate bool, newline bool, hexCode bool)
 		AddMessageWithUint32(message []byte, value uint32, separate bool, newline bool, hexCode bool)
@@ -33,9 +31,9 @@ type (
 		InfoMessage(message []byte)
 		Warning()
 		WarningMessage(message []byte)
-		WarningMessageWithErrorCode(message []byte, errCode tinygotypes.ErrorCode, separate bool)
+		WarningMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool)
 		Error()
 		ErrorMessage(message []byte)
-		ErrorMessageWithErrorCode(message []byte, errCode tinygotypes.ErrorCode, separate bool)
+		ErrorMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool)
 	}
 )
