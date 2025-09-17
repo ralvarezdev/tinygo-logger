@@ -10,9 +10,9 @@ import (
 
 type (
 	// DefaultLogger is a simple implementation of the Logger interface
-	DefaultLogger struct{
+	DefaultLogger struct {
 		messageBuffer []byte
-		messageIndex int
+		messageIndex  int
 	}
 )
 
@@ -55,7 +55,7 @@ func (l *DefaultLogger) writeTimestamp() {
 	os.Stdout.Write(buffer)
 }
 
-// writeNewline is a helper function to print a newline 
+// writeNewline is a helper function to print a newline
 func (l *DefaultLogger) writeNewline() {
 	os.Stdout.Write(tinygobuffers.NewlineBuffer)
 }
@@ -122,6 +122,7 @@ func (l *DefaultLogger) AddTab() {
 // Parameters:
 //
 //	hexBuffer: The byte slice representing the hex code to print in hexadecimal format.
+//
 // newline: Whether to include a newline at the end of the log message.
 func (l *DefaultLogger) AddHexCode(hexBuffer []byte, newline bool) {
 	if hexBuffer != nil {
@@ -147,6 +148,7 @@ func (l *DefaultLogger) AddHexCode(hexBuffer []byte, newline bool) {
 // Parameters:
 //
 //	errCode: The error code to add to the message buffer.
+//
 // newline: Whether to include a newline at the end of the log message.
 func (l *DefaultLogger) AddErrorCode(errCode tinygoerrors.ErrorCode, newline bool) {
 	l.AddUint16(uint16(errCode), newline, true)
@@ -175,6 +177,7 @@ func (l *DefaultLogger) AddUint8(value uint8, newline bool, hexCode bool) {
 //
 //	value: The uint16 value to add.
 //	newline: Whether to include a newline at the end of the log message.
+//
 // hexCode: Whether to add the uint16 value in hexadecimal format.
 func (l *DefaultLogger) AddUint16(value uint16, newline bool, hexCode bool) {
 	if hexCode {
@@ -192,6 +195,7 @@ func (l *DefaultLogger) AddUint16(value uint16, newline bool, hexCode bool) {
 //
 //	value: The uint32 value to add.
 //	newline: Whether to include a newline at the end of the log message.
+//
 // hexCode: Whether to add the uint32 value in hexadecimal format.
 func (l *DefaultLogger) AddUint32(value uint32, newline bool, hexCode bool) {
 	if hexCode {
@@ -209,6 +213,7 @@ func (l *DefaultLogger) AddUint32(value uint32, newline bool, hexCode bool) {
 //
 //	value: The uint64 value to add.
 //	newline: Whether to include a newline at the end of the log message.
+//
 // hexCode: Whether to add the uint64 value in hexadecimal format.
 func (l *DefaultLogger) AddUint64(value uint64, newline bool, hexCode bool) {
 	if hexCode {
@@ -225,9 +230,20 @@ func (l *DefaultLogger) AddUint64(value uint64, newline bool, hexCode bool) {
 // Parameters:
 //
 //	value: The float64 value to add.
+//	precision: The number of decimal places to include.
 //	newline: Whether to include a newline at the end of the log message.
-func (l *DefaultLogger) AddFloat64(value float64, newline bool) {
-	// Store the float64 value in the buffer
+func (l *DefaultLogger) AddFloat64(value float64, precision int, newline bool) {
+	for i := precision; i >= 0; i-- {
+		// Store the float64 value in the buffer
+		buffer, err := tinygobuffers.Float64ToDecimal(value, i)
+		if err != tinygoerrors.ErrorCodeNil {
+			continue
+		}
+		l.AddMessage(buffer, newline)
+		return
+	}
+
+	// If all precisions fail, fallback to raw float64 representation
 	tinygobuffers.Float64ToBytes(value, tinygobuffers.Float64Buffer[:])
 	l.AddMessage(tinygobuffers.Float64Buffer[:], newline)
 }
@@ -354,14 +370,15 @@ func (l *DefaultLogger) AddMessageWithUint64(message []byte, value uint64, separ
 //
 //	message: The byte slice representing the message to add.
 //	value: The float64 value to add.
+//	precision: The number of decimal places to include.
 //	separate: Whether to include a space between the message and float64 value.
 //	newline: Whether to include a newline at the end of the log message.
-func (l *DefaultLogger) AddMessageWithFloat64(message []byte, value float64, separate bool, newline bool) {
+func (l *DefaultLogger) AddMessageWithFloat64(message []byte, value float64, precision int, separate bool, newline bool) {
 	l.AddMessage(message, false)
 	if separate {
 		l.AddSpace()
 	}
-	l.AddFloat64(value, newline)
+	l.AddFloat64(value, precision, newline)
 }
 
 // log functions for different log levels
