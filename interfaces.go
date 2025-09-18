@@ -18,22 +18,70 @@ type (
 		AddUint64(value uint64, newline bool, hexCode bool)
 		AddFloat64(value float64, precision int, newline bool)
 		AddMessage(message []byte, newline bool)
-		AddMessageWithHexCode(message []byte, hexBuffer []byte, separate bool, newline bool)
-		AddMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool, newline bool)
-		AddMessageWithUint8(message []byte, value uint8, separate bool, newline bool, hexCode bool)
-		AddMessageWithUint16(message []byte, value uint16, separate bool, newline bool, hexCode bool)
-		AddMessageWithUint32(message []byte, value uint32, separate bool, newline bool, hexCode bool)
-		AddMessageWithUint64(message []byte, value uint64, separate bool, newline bool, hexCode bool)
-		AddMessageWithFloat64(message []byte, value float64, precision int, separate bool, newline bool)
+		AddMessageWithHexCode(
+			message []byte,
+			hexBuffer []byte,
+			separate bool,
+			newline bool,
+		)
+		AddMessageWithErrorCode(
+			message []byte,
+			errCode tinygoerrors.ErrorCode,
+			separate bool,
+			newline bool,
+		)
+		AddMessageWithUint8(
+			message []byte,
+			value uint8,
+			separate bool,
+			newline bool,
+			hexCode bool,
+		)
+		AddMessageWithUint16(
+			message []byte,
+			value uint16,
+			separate bool,
+			newline bool,
+			hexCode bool,
+		)
+		AddMessageWithUint32(
+			message []byte,
+			value uint32,
+			separate bool,
+			newline bool,
+			hexCode bool,
+		)
+		AddMessageWithUint64(
+			message []byte,
+			value uint64,
+			separate bool,
+			newline bool,
+			hexCode bool,
+		)
+		AddMessageWithFloat64(
+			message []byte,
+			value float64,
+			precision int,
+			separate bool,
+			newline bool,
+		)
 		Debug()
 		DebugMessage(message []byte)
 		Info()
 		InfoMessage(message []byte)
 		Warning()
 		WarningMessage(message []byte)
-		WarningMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool)
+		WarningMessageWithErrorCode(
+			message []byte,
+			errCode tinygoerrors.ErrorCode,
+			separate bool,
+		)
 		Error()
 		ErrorMessage(message []byte)
-		ErrorMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool)
+		ErrorMessageWithErrorCode(
+			message []byte,
+			errCode tinygoerrors.ErrorCode,
+			separate bool,
+		)
 	}
 )

@@ -24,7 +24,7 @@ type (
 //
 // Returns:
 //
-//	*DefaultLogger: A pointer to the newly created DefaultLogger instance.
+//	A pointer to the newly created DefaultLogger instance.
 func NewDefaultLogger(bufferSize uint64) *DefaultLogger {
 	return &DefaultLogger{
 		messageBuffer: make([]byte, bufferSize),
@@ -122,8 +122,7 @@ func (l *DefaultLogger) AddTab() {
 // Parameters:
 //
 //	hexBuffer: The byte slice representing the hex code to print in hexadecimal format.
-//
-// newline: Whether to include a newline at the end of the log message.
+//	newline: Whether to include a newline at the end of the log message.
 func (l *DefaultLogger) AddHexCode(hexBuffer []byte, newline bool) {
 	if hexBuffer != nil {
 		for c := range tinygobuffers.HexPrefix {
@@ -148,13 +147,15 @@ func (l *DefaultLogger) AddHexCode(hexBuffer []byte, newline bool) {
 // Parameters:
 //
 //	errCode: The error code to add to the message buffer.
-//
-// newline: Whether to include a newline at the end of the log message.
-func (l *DefaultLogger) AddErrorCode(errCode tinygoerrors.ErrorCode, newline bool) {
+//	newline: Whether to include a newline at the end of the log message.
+func (l *DefaultLogger) AddErrorCode(
+	errCode tinygoerrors.ErrorCode,
+	newline bool,
+) {
 	l.AddUint16(uint16(errCode), newline, true)
 }
 
-// AddUint8 function to add a uint8 value to the messageBuffer
+// AddUint8 function to add an uint8 value to the messageBuffer
 //
 // Parameters:
 //
@@ -171,14 +172,13 @@ func (l *DefaultLogger) AddUint8(value uint8, newline bool, hexCode bool) {
 	}
 }
 
-// AddUint16 function to add a uint16 value to the messageBuffer
+// AddUint16 function to add an uint16 value to the messageBuffer
 //
 // Parameters:
 //
 //	value: The uint16 value to add.
 //	newline: Whether to include a newline at the end of the log message.
-//
-// hexCode: Whether to add the uint16 value in hexadecimal format.
+//	hexCode: Whether to add the uint16 value in hexadecimal format.
 func (l *DefaultLogger) AddUint16(value uint16, newline bool, hexCode bool) {
 	if hexCode {
 		buffer := tinygobuffers.Uint16ToHex(value)
@@ -189,14 +189,13 @@ func (l *DefaultLogger) AddUint16(value uint16, newline bool, hexCode bool) {
 	}
 }
 
-// AddUint32 function to add a uint32 value to the messageBuffer
+// AddUint32 function to add an uint32 value to the messageBuffer
 //
 // Parameters:
 //
 //	value: The uint32 value to add.
 //	newline: Whether to include a newline at the end of the log message.
-//
-// hexCode: Whether to add the uint32 value in hexadecimal format.
+//	hexCode: Whether to add the uint32 value in hexadecimal format.
 func (l *DefaultLogger) AddUint32(value uint32, newline bool, hexCode bool) {
 	if hexCode {
 		buffer := tinygobuffers.Uint32ToHex(value)
@@ -207,14 +206,13 @@ func (l *DefaultLogger) AddUint32(value uint32, newline bool, hexCode bool) {
 	}
 }
 
-// AddUint64 function to add a uint64 value to the messageBuffer
+// AddUint64 function to add an uint64 value to the messageBuffer
 //
 // Parameters:
 //
 //	value: The uint64 value to add.
 //	newline: Whether to include a newline at the end of the log message.
-//
-// hexCode: Whether to add the uint64 value in hexadecimal format.
+//	hexCode: Whether to add the uint64 value in hexadecimal format.
 func (l *DefaultLogger) AddUint64(value uint64, newline bool, hexCode bool) {
 	if hexCode {
 		buffer := tinygobuffers.Uint64ToHex(value)
@@ -276,7 +274,12 @@ func (l *DefaultLogger) AddMessage(message []byte, newline bool) {
 //	hexBuffer: The byte slice representing the hex code to add in hexadecimal format.
 //	separate: Whether to include a space between the message and hex code.
 //	newline: Whether to include a newline at the end of the log message.
-func (l *DefaultLogger) AddMessageWithHexCode(message []byte, hexBuffer []byte, separate bool, newline bool) {
+func (l *DefaultLogger) AddMessageWithHexCode(
+	message []byte,
+	hexBuffer []byte,
+	separate bool,
+	newline bool,
+) {
 	l.AddMessage(message, false)
 	if separate {
 		l.AddSpace()
@@ -292,7 +295,12 @@ func (l *DefaultLogger) AddMessageWithHexCode(message []byte, hexBuffer []byte, 
 //	errCode: The error code to add to the message buffer.
 //	separate: Whether to include a space between the message and error code.
 //	newline: Whether to include a newline at the end of the log message.
-func (l *DefaultLogger) AddMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool, newline bool) {
+func (l *DefaultLogger) AddMessageWithErrorCode(
+	message []byte,
+	errCode tinygoerrors.ErrorCode,
+	separate bool,
+	newline bool,
+) {
 	l.AddMessageWithUint16(message, uint16(errCode), separate, newline, true)
 }
 
@@ -305,7 +313,13 @@ func (l *DefaultLogger) AddMessageWithErrorCode(message []byte, errCode tinygoer
 //	separate: Whether to include a space between the message and uint8 value.
 //	newline: Whether to include a newline at the end of the log message.
 //	hexCode: Whether to add the uint8 value in hexadecimal format.
-func (l *DefaultLogger) AddMessageWithUint8(message []byte, value uint8, separate bool, newline bool, hexCode bool) {
+func (l *DefaultLogger) AddMessageWithUint8(
+	message []byte,
+	value uint8,
+	separate bool,
+	newline bool,
+	hexCode bool,
+) {
 	l.AddMessage(message, false)
 	if separate {
 		l.AddSpace()
@@ -322,7 +336,13 @@ func (l *DefaultLogger) AddMessageWithUint8(message []byte, value uint8, separat
 //	separate: Whether to include a space between the message and uint16 value.
 //	newline: Whether to include a newline at the end of the log message.
 //	hexCode: Whether to add the uint16 value in hexadecimal format.
-func (l *DefaultLogger) AddMessageWithUint16(message []byte, value uint16, separate bool, newline bool, hexCode bool) {
+func (l *DefaultLogger) AddMessageWithUint16(
+	message []byte,
+	value uint16,
+	separate bool,
+	newline bool,
+	hexCode bool,
+) {
 	l.AddMessage(message, false)
 	if separate {
 		l.AddSpace()
@@ -339,7 +359,13 @@ func (l *DefaultLogger) AddMessageWithUint16(message []byte, value uint16, separ
 //	separate: Whether to include a space between the message and uint32 value.
 //	newline: Whether to include a newline at the end of the log message.
 //	hexCode: Whether to add the uint32 value in hexadecimal format.
-func (l *DefaultLogger) AddMessageWithUint32(message []byte, value uint32, separate bool, newline bool, hexCode bool) {
+func (l *DefaultLogger) AddMessageWithUint32(
+	message []byte,
+	value uint32,
+	separate bool,
+	newline bool,
+	hexCode bool,
+) {
 	l.AddMessage(message, false)
 	if separate {
 		l.AddSpace()
@@ -356,7 +382,13 @@ func (l *DefaultLogger) AddMessageWithUint32(message []byte, value uint32, separ
 //	separate: Whether to include a space between the message and uint64 value.
 //	newline: Whether to include a newline at the end of the log message.
 //	hexCode: Whether to add the uint64 value in hexadecimal format.
-func (l *DefaultLogger) AddMessageWithUint64(message []byte, value uint64, separate bool, newline bool, hexCode bool) {
+func (l *DefaultLogger) AddMessageWithUint64(
+	message []byte,
+	value uint64,
+	separate bool,
+	newline bool,
+	hexCode bool,
+) {
 	l.AddMessage(message, false)
 	if separate {
 		l.AddSpace()
@@ -373,7 +405,13 @@ func (l *DefaultLogger) AddMessageWithUint64(message []byte, value uint64, separ
 //	precision: The number of decimal places to include.
 //	separate: Whether to include a space between the message and float64 value.
 //	newline: Whether to include a newline at the end of the log message.
-func (l *DefaultLogger) AddMessageWithFloat64(message []byte, value float64, precision int, separate bool, newline bool) {
+func (l *DefaultLogger) AddMessageWithFloat64(
+	message []byte,
+	value float64,
+	precision int,
+	separate bool,
+	newline bool,
+) {
 	l.AddMessage(message, false)
 	if separate {
 		l.AddSpace()
@@ -458,7 +496,11 @@ func (l *DefaultLogger) InfoMessage(message []byte) {
 //	message: The byte slice representing the warning message to print.
 //	errCode: The error code to add to the message buffer.
 //	separate: Whether to include a space between the message and error code.
-func (l *DefaultLogger) WarningMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool) {
+func (l *DefaultLogger) WarningMessageWithErrorCode(
+	message []byte,
+	errCode tinygoerrors.ErrorCode,
+	separate bool,
+) {
 	l.AddMessageWithErrorCode(message, errCode, separate, true)
 	l.Warning()
 }
@@ -470,7 +512,11 @@ func (l *DefaultLogger) WarningMessageWithErrorCode(message []byte, errCode tiny
 //	message: The byte slice representing the error message to print.
 //	errCode: The error code to add to the message buffer.
 //	separate: Whether to include a space between the message and error code.
-func (l *DefaultLogger) ErrorMessageWithErrorCode(message []byte, errCode tinygoerrors.ErrorCode, separate bool) {
+func (l *DefaultLogger) ErrorMessageWithErrorCode(
+	message []byte,
+	errCode tinygoerrors.ErrorCode,
+	separate bool,
+) {
 	l.AddMessageWithErrorCode(message, errCode, separate, true)
 	l.Error()
 }

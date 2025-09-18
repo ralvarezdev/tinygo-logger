@@ -27,12 +27,24 @@ func DebugMemory(logger Logger) {
 	}
 
 	// Read memory statistics
-    var m runtime.MemStats
-    runtime.ReadMemStats(&m)
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
 
 	// Log memory stats
 	logger.AddMessage(memoryStatsHeader, true)
-	logger.AddMessageWithUint64(memoryStatsAllocKey, m.Alloc/1024, true, true, false)
-	logger.AddMessageWithUint64(memoryStatsTotalAllocKey, m.TotalAlloc/1024, true, true, false)
+	logger.AddMessageWithUint64(
+		memoryStatsAllocKey,
+		m.Alloc/1024,
+		true,
+		true,
+		false,
+	)
+	logger.AddMessageWithUint64(
+		memoryStatsTotalAllocKey,
+		m.TotalAlloc/1024,
+		true,
+		true,
+		false,
+	)
 	logger.Debug()
 }
